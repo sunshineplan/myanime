@@ -95,9 +95,7 @@ func (a *anime) getPlayList() error {
 }
 
 func (p *play) getURL() (string, error) {
-	referer := fmt.Sprintf("%s/play/%s?playid=%s_%s", api, p.AID, p.Index, p.EP)
-
-	s.Get(referer, nil)
+	s.Get(fmt.Sprintf("%s/play/%s?playid=%s_%s", api, p.AID, p.Index, p.EP), nil)
 
 	var t1 float64
 	for _, i := range s.Cookies(u) {
@@ -113,8 +111,10 @@ func (p *play) getURL() (string, error) {
 	s.SetCookie(u, "fa_t", fmt.Sprint(time.Now().UnixNano()/1e6))
 	s.SetCookie(u, "fa_c", "1")
 
-	headers := gohttp.H{"referer": referer}
-	resp := s.Get(fmt.Sprintf("%s/_getplay?aid=%s&playindex=%s&epindex=%s", api, p.AID, p.Index, p.EP), headers)
+	resp := s.Get(
+		fmt.Sprintf("%s/_getplay?aid=%s&playindex=%s&epindex=%s", api, p.AID, p.Index, p.EP),
+		gohttp.H{"referer": api},
+	)
 	var r struct{ Vurl string }
 	if err := resp.JSON(&r); err != nil {
 		return "", err
