@@ -14,19 +14,19 @@ import (
 )
 
 type anime struct {
-	ID       string
-	Name     string
-	URL      string
-	Image    string
-	PlayList []play
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	URL      string `json:"url"`
+	Image    string `json:"image"`
+	PlayList []play `json:"playlist"`
 }
 
 type play struct {
-	AID   string
-	URL   string
-	Index string
-	EP    string
-	Title string
+	AID   string `json:"aid"`
+	URL   string `json:"url"`
+	Index string `json:"index"`
+	EP    string `json:"ep"`
+	Title string `json:"title"`
 }
 
 func getList() ([]anime, error) {
@@ -64,7 +64,7 @@ func (a *anime) getPlayList() error {
 	var movurl soup.Root
 	doc := soup.HTMLParse(resp)
 	for _, i := range doc.FindAll("div", "class", "movurl") {
-		if i.Attrs()["style"] == "display:block" {
+		if strings.Contains(i.Attrs()["style"], "block") {
 			movurl = i
 			break
 		}
@@ -73,7 +73,7 @@ func (a *anime) getPlayList() error {
 		return errors.New("failed to get movurl")
 	}
 
-	var playlist []play
+	playlist := []play{}
 	for _, i := range movurl.FindAll("a") {
 		href, err := url.Parse(i.Attrs()["href"])
 		if err != nil {
