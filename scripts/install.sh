@@ -53,6 +53,7 @@ writeLogrotateScrip() {
 setupNGINX() {
     cp -s /var/www/myanime/scripts/myanime.conf /etc/nginx/conf.d
     sed -i "s/\$domain/$domain/" /var/www/myanime/scripts/myanime.conf
+    sed -i "s,\$unix,$unix," /var/www/myanime/scripts/myanime.conf
     service nginx reload
 }
 
