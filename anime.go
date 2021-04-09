@@ -1,9 +1,9 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"math"
+	"math/rand"
 	"net/url"
 	"strconv"
 	"strings"
@@ -61,20 +61,15 @@ func (a *anime) getPlayList() error {
 		return err
 	}
 
-	var movurl soup.Root
 	doc := soup.HTMLParse(resp)
-	for _, i := range doc.FindAll("div", "class", "movurl") {
-		if strings.Contains(i.Attrs()["style"], "block") {
-			movurl = i
-			break
-		}
-	}
-	if movurl.Pointer == nil {
-		return errors.New("failed to get movurl")
+
+	index, err := strconv.Atoi(doc.Find("script", "id", "DEF_PLAYINDEX").Text())
+	if err != nil {
+		return err
 	}
 
 	playlist := []play{}
-	for _, i := range movurl.FindAll("a") {
+	for _, i := range doc.FindAll("div", "class", "movurl")[index].FindAll("a") {
 		href, err := url.Parse(i.Attrs()["href"])
 		if err != nil {
 			return err
@@ -106,13 +101,22 @@ func (p *play) getURL() (string, error) {
 	}
 	t := int(math.Round(t1/1000)) >> 5
 
-	s.SetCookie(u, "t2", fmt.Sprint(time.Now().UnixNano()/1e6))
-	s.SetCookie(u, "k2", fmt.Sprint((t*(t%4096)*3+83215)*(t%4096)+t))
+	k2 := fmt.Sprint((t*(t%4096)*3+83215)*(t%4096) + t)
+	var t2 string
+	for {
+		t2 = fmt.Sprint(time.Now().UnixNano() / 1e6)
+		if strings.Contains(t2[len(t2)-3:], k2[len(k2)-1:]) {
+			break
+		}
+	}
+
+	s.SetCookie(u, "k2", k2)
+	s.SetCookie(u, "t2", t2)
 	s.SetCookie(u, "fa_t", fmt.Sprint(time.Now().UnixNano()/1e6))
 	s.SetCookie(u, "fa_c", "1")
 
 	resp := s.Get(
-		fmt.Sprintf("%s/_getplay?aid=%s&playindex=%s&epindex=%s", api, p.AID, p.Index, p.EP),
+		fmt.Sprintf("%s/_getplay?aid=%s&playindex=%s&epindex=%s&r=%.f", api, p.AID, p.Index, p.EP, rand.Float64()),
 		gohttp.H{"referer": api},
 	)
 	var r struct{ Vurl string }

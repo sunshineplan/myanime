@@ -6,7 +6,7 @@ installSoftware() {
 
 installMyAnime() {
     mkdir -p /var/www/myanime
-    curl -Lo- https://github.com/sunshineplan/myanime/releases/download/v1.0/release-linux.tar.gz | tar zxC /var/www/myanime
+    curl -Lo- https://github.com/sunshineplan/myanime/releases/download/v1.0/release.tar.gz | tar zxC /var/www/myanime
     cd /var/www/myanime
     chmod +x myanime
 }

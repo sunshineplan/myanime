@@ -101,7 +101,7 @@
   }
 
   .playlist {
-    height: 208px;
+    height: 230px;
     width: calc(100% - 170px);
     overflow: auto;
     align-self: center;

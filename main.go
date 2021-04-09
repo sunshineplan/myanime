@@ -4,10 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/sunshineplan/gohttp"
 	"github.com/sunshineplan/service"
@@ -44,6 +46,8 @@ func init() {
 		agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.114 Safari/537.36"
 	}
 	gohttp.SetAgent(agent)
+
+	rand.Seed(time.Now().UnixNano())
 }
 
 func usage(errmsg string) {
