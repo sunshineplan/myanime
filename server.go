@@ -34,10 +34,12 @@ func run() {
 	})
 
 	router.GET("/list", func(c *gin.Context) {
+		q := c.Query("q")
+
 		var list []anime
 		var err error
 		if err := utils.Retry(func() error {
-			list, err = getList()
+			list, err = getList(q)
 			return err
 		}, 3, 2); err != nil {
 			log.Print(err)

@@ -29,15 +29,28 @@ type play struct {
 	Title string `json:"title"`
 }
 
-func getList() ([]anime, error) {
-	resp, err := soup.Get(fmt.Sprintf("%s/update", api))
-	if err != nil {
-		return nil, err
+func getList(query string) ([]anime, error) {
+	var roots []soup.Root
+	if query == "" {
+		resp, err := soup.Get(fmt.Sprintf("%s/update", api))
+		if err != nil {
+			return nil, err
+		}
+
+		doc := soup.HTMLParse(resp)
+		roots = doc.FindAll("li", "class", "anime_icon2")
+	} else {
+		resp, err := soup.Get(fmt.Sprintf("%s/search?query="+query, api))
+		if err != nil {
+			return nil, err
+		}
+
+		doc := soup.HTMLParse(resp)
+		roots = doc.FindAll("div", "class", "cell")
 	}
 
 	var result []anime
-	doc := soup.HTMLParse(resp)
-	for _, i := range doc.FindAll("li", "class", "anime_icon2") {
+	for _, i := range roots {
 		var anime anime
 
 		a := i.Find("a")
