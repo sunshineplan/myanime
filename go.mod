@@ -9,5 +9,5 @@ require (
 	github.com/sunshineplan/service v0.0.0-20210225015410-ded17aad0e4b
 	github.com/sunshineplan/utils v0.0.0-20210318052909-87522d87aa73
 	github.com/vharitonsky/iniflags v0.0.0-20180513140207-a33cd0b5f3de
-	golang.org/x/net v0.0.0-20210410081132-afb366fc7cd1 // indirect
+	golang.org/x/net v0.0.0-20210414194228-064579744ee0 // indirect
 )

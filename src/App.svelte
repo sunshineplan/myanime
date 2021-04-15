@@ -33,6 +33,9 @@
       if (Array.isArray(json)) {
         list = json as anime[];
         return;
+      } else if (!json) {
+        alert("No anime found");
+        return;
       }
     }
     alert("Failed to get list");
