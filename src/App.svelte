@@ -42,11 +42,13 @@
   };
 
   const open = async (play: play) => {
+    loading++;
     const resp = await fetch("/play", {
       method: "post",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(play),
     });
+    loading--;
     if (resp.ok) {
       const url = await resp.text();
       window.open(url);
