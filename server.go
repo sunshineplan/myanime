@@ -12,9 +12,6 @@ import (
 )
 
 func run() {
-	router := gin.Default()
-	server.Handler = router
-
 	if *logPath != "" {
 		f, err := os.OpenFile(*logPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0640)
 		if err != nil {
@@ -24,6 +21,9 @@ func run() {
 		gin.DefaultErrorWriter = f
 		log.SetOutput(f)
 	}
+
+	router := gin.Default()
+	server.Handler = router
 
 	router.StaticFS("/build", http.Dir(filepath.Join(filepath.Dir(self), "public/build")))
 	router.StaticFile("favicon.ico", filepath.Join(filepath.Dir(self), "public/favicon.ico"))
