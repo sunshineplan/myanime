@@ -19,24 +19,33 @@
 
   let query = "";
   let list: anime[] = [];
+  let page = 1;
+  let total: number;
   let loading = 0;
 
-  const search = async (query?: string) => {
-    let url: string;
-    if (query) url = "/list?q=" + query;
-    else url = "/list";
+  const search = async (more?: boolean) => {
+    if (more) {
+      if (page < total) page++;
+      else return;
+    }
+    const url = new URL(window.location.origin + "/list");
+    if (query) url.searchParams.set("q", query);
+    if (more && page > 1) url.searchParams.set("p", page.toString());
     loading++;
-    const resp = await fetch(url);
+    const resp = await fetch(url.toString());
     loading--;
     if (resp.ok) {
       const json = await resp.json();
-      if (Array.isArray(json)) {
-        list = json as anime[];
-        return;
-      } else if (!json) {
-        alert("No anime found");
-        return;
-      }
+      if (json.list) {
+        if (!more) {
+          const div = document.querySelector(".content");
+          if (div) div.scrollTop = 0;
+          page = 1;
+          list = json.list;
+          total = json.total;
+        } else list = list.concat(json.list);
+      } else alert("No anime found");
+      return;
     }
     alert("Failed to get list");
   };
@@ -52,13 +61,23 @@
     if (resp.ok) {
       const url = await resp.text();
       window.open(url);
-    } else alert("Failed to get play");
+      return;
+    }
+    alert("Failed to get play");
+  };
+
+  const handleScroll = async () => {
+    const div = document.querySelector(".content") as Element;
+    if (div.scrollTop + div.clientHeight >= div.scrollHeight)
+      await search(true);
   };
 
   onMount(async () => {
     await search();
   });
 </script>
+
+<svelte:window on:scroll|capture={handleScroll} />
 
 <header class="navbar navbar-expand flex-column flex-md-row">
   <a class="navbar-brand text-primary m-0 mr-md-3" href="/">My Anime</a>
@@ -70,12 +89,12 @@
       placeholder="Search Anime"
       on:keydown={async (e) => {
         if (e.key === "Escape") query = "";
-        else if (e.key === "Enter") await search(query);
+        else if (e.key === "Enter") await search();
       }}
     />
     <button
       class="btn btn-outline-primary"
-      on:click={async () => await search(query)}
+      on:click={async () => await search()}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

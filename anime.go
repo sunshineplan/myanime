@@ -29,27 +29,52 @@ type play struct {
 	Title string `json:"title"`
 }
 
-func getList(query string) ([]anime, error) {
+func getList(query string, page int) (list []anime, total int, err error) {
+	var resp string
+	var doc soup.Root
 	var roots []soup.Root
 	if query == "" {
-		resp, err := soup.Get(fmt.Sprintf("%s/update", api))
+		resp, err = soup.Get(fmt.Sprintf("%s/update?page=%d", api, page))
 		if err != nil {
-			return nil, err
+			return
 		}
 
-		doc := soup.HTMLParse(resp)
+		doc = soup.HTMLParse(resp)
 		roots = doc.FindAll("li", "class", "anime_icon2")
 	} else {
-		resp, err := soup.Get(fmt.Sprintf("%s/search?query="+query, api))
+		resp, err = soup.Get(fmt.Sprintf("%s/search?query=%s&page=%d", api, query, page))
 		if err != nil {
-			return nil, err
+			return
 		}
 
-		doc := soup.HTMLParse(resp)
+		doc = soup.HTMLParse(resp)
 		roots = doc.FindAll("div", "class", "cell")
 	}
 
-	var result []anime
+	var href string
+	for _, i := range doc.FindAll("a", "class", "pbutton") {
+		if i.Text() == "尾页" {
+			href = i.Attrs()["href"]
+			break
+		}
+	}
+
+	if strings.Contains(href, "page=") {
+		total, err = strconv.Atoi(strings.Split(href, "page=")[1])
+		if err != nil {
+			return
+		}
+	} else {
+		if query != "" {
+			if len(roots) > 0 {
+				total = 1
+			}
+		} else {
+			err = fmt.Errorf("unknow error, page: %d", page)
+			return
+		}
+	}
+
 	for _, i := range roots {
 		var anime anime
 
@@ -62,41 +87,51 @@ func getList(query string) ([]anime, error) {
 		anime.Name = img.Attrs()["alt"]
 		anime.Image = img.Attrs()["src"]
 
-		result = append(result, anime)
+		list = append(list, anime)
 	}
 
-	return result, nil
+	return
 }
 
-func (a *anime) getPlayList() error {
-	resp, err := soup.Get(a.URL)
+func getPlayList(u, id string) ([]play, error) {
+	resp, err := soup.Get(u)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	doc := soup.HTMLParse(resp)
 
 	index, err := strconv.Atoi(doc.Find("script", "id", "DEF_PLAYINDEX").Text())
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	playlist := []play{}
 	for _, i := range doc.FindAll("div", "class", "movurl")[index].FindAll("a") {
 		href, err := url.Parse(i.Attrs()["href"])
 		if err != nil {
-			return err
+			return nil, err
 		}
 		playid := href.Query().Get("playid")
 
 		playlist = append(playlist, play{
-			AID:   a.ID,
+			AID:   id,
 			URL:   api + href.String(),
 			Index: strings.Split(playid, "_")[0],
 			EP:    strings.Split(playid, "_")[1],
 			Title: i.Text(),
 		})
 	}
+
+	return playlist, nil
+}
+
+func (a *anime) getPlayList() error {
+	playlist, err := loadPlayList(a.URL, a.ID)
+	if err != nil {
+		return err
+	}
+
 	a.PlayList = playlist
 
 	return nil

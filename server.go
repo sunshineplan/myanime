@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -35,11 +36,21 @@ func run() {
 
 	router.GET("/list", func(c *gin.Context) {
 		q := c.Query("q")
+		p := c.Query("p")
+		if p == "" {
+			p = "1"
+		}
+
+		page, err := strconv.Atoi(p)
+		if err != nil {
+			c.String(400, "")
+			return
+		}
 
 		var list []anime
-		var err error
+		var total int
 		if err := utils.Retry(func() error {
-			list, err = getList(q)
+			list, total, err = loadList(q, page)
 			return err
 		}, 3, 2); err != nil {
 			log.Print(err)
@@ -65,7 +76,7 @@ func run() {
 			return
 		}
 
-		c.JSON(200, list)
+		c.JSON(200, gin.H{"total": total, "list": list})
 	})
 
 	router.POST("/play", func(c *gin.Context) {
