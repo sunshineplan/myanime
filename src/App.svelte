@@ -22,8 +22,10 @@
   let page = 1;
   let total: number;
   let loading = 0;
+  let hidden = true;
 
   const search = async (more?: boolean) => {
+    if (loading) return;
     if (more) {
       if (page < total) page++;
       else return;
@@ -67,9 +69,13 @@
   };
 
   const handleScroll = async () => {
-    const div = document.querySelector(".content") as Element;
-    if (div.scrollTop + div.clientHeight >= div.scrollHeight)
-      await search(true);
+    const div = document.querySelector(".content");
+    if (div) {
+      if (div.scrollTop > 150) hidden = false;
+      else hidden = true;
+      if (div.scrollTop + div.clientHeight >= div.scrollHeight)
+        await search(true);
+    }
   };
 
   onMount(async () => {
@@ -135,6 +141,26 @@
     <div class="sk-wave-rect" />
     <div class="sk-wave-rect" />
   </div>
+</div>
+<div
+  class="top btn btn-secondary"
+  on:click={() => {
+    const div = document.querySelector(".content");
+    if (div) div.scrollTop = 0;
+  }}
+  class:hidden
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    fill="currentColor"
+    viewBox="0 0 16 16"
+  >
+    <path
+      d="M3.204 11h9.592L8 5.519 3.204 11zm-.753-.659 4.796-5.48a1 1 0 0 1 1.506 0l4.796 5.48c.566.647.106 1.659-.753 1.659H3.204a1 1 0 0 1-.753-1.659z"
+    />
+  </svg>
 </div>
 
 <style>
@@ -224,6 +250,24 @@
     border-radius: 3px;
     padding: 5px;
     color: #343a40;
+  }
+
+  .top {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 99;
+    opacity: 0.6;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .top:hover {
+    opacity: 0.9;
+  }
+
+  .top.hidden {
+    opacity: 0;
+    visibility: hidden;
   }
 
   @media (max-width: 767px) {

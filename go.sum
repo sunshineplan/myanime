@@ -37,9 +37,8 @@ github.com/stretchr/testify v1.6.1 h1:hDPOHmpOpP40lSULcqw7IrRb/u7w6RpDC9399XyoNd
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/sunshineplan/gohttp v0.0.0-20210204014530-daea15215be3 h1:9ERbMyp+DZd+4/ZUUmJS2fSdV78we76nK5ItARXYq2g=
 github.com/sunshineplan/gohttp v0.0.0-20210204014530-daea15215be3/go.mod h1:KaIWij1g41q0MnVSAe2pyReheMYhrHsMcwlBQGppv9A=
-github.com/sunshineplan/service v0.0.0-20210225015410-ded17aad0e4b h1:hmzhD6+zCbY8mWJDwRMp/ddHpwBGseVAUNx8piNjDDk=
-github.com/sunshineplan/service v0.0.0-20210225015410-ded17aad0e4b/go.mod h1:Zy1+OGy5mkquzNjfm1bJ4RulUHlh2cutbfKUNx+truI=
-github.com/sunshineplan/utils v0.0.0-20210224010154-f102cd242d60/go.mod h1:fJ8/Fjbd50RwQ8/wxBmBgkuDHfcXrCJu6c/iRsgkYok=
+github.com/sunshineplan/service v0.0.0-20210527094821-51dc65f50fad h1:NRiBc4gd59Tib0S32w8fRcuc+TZDsGhawXa4a8JWUtU=
+github.com/sunshineplan/service v0.0.0-20210527094821-51dc65f50fad/go.mod h1:Pev64yUao6MQcTiP2vQUWTNGwQNX/QqG3li9dKwoOyk=
 github.com/sunshineplan/utils v0.0.0-20210508081115-49f48cf588e1 h1:M5oooa+leFxECNgsHhAeZUZzMlz5/2u2aXWVKUD1GUE=
 github.com/sunshineplan/utils v0.0.0-20210508081115-49f48cf588e1/go.mod h1:fJ8/Fjbd50RwQ8/wxBmBgkuDHfcXrCJu6c/iRsgkYok=
 github.com/ugorji/go v1.1.7 h1:/68gy2h+1mWMrwZFeD1kQialdSzAb432dtpeJ42ovdo=
@@ -59,9 +58,9 @@ golang.org/x/sys v0.0.0-20190215142949-d0b11bdaac8a/go.mod h1:STP8DvDyc/dI5b8T5h
 golang.org/x/sys v0.0.0-20190412213103-97732733099d/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200116001909-b77594299b42/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20201119102817-f84b799fce68/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
-golang.org/x/sys v0.0.0-20210223212115-eede4237b368/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
-golang.org/x/sys v0.0.0-20210423082822-04245dca01da h1:b3NXsE2LusjYGGjL5bxEVZZORm/YEFFrWFjR8eFrw/c=
 golang.org/x/sys v0.0.0-20210423082822-04245dca01da/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20210525143221-35b2ab0089ea h1:+WiDlPBBaO+h9vPNZi8uJ3k4BkKQB7Iow3aqwHVA5hI=
+golang.org/x/sys v0.0.0-20210525143221-35b2ab0089ea/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.2/go.mod h1:bEr9sfX3Q8Zfm5fL9x+3itogRgK3+ptLWKqgva+5dAk=
