@@ -5,6 +5,8 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  schedule:
+    - cron: '0 0 1 * *'
 
 jobs:
   test:
@@ -32,3 +34,4 @@ jobs:
           npm run build
           go mod download
           go build -v ./...
+          go test -api ${{ secrets.API }}
