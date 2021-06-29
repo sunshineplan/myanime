@@ -28,7 +28,10 @@ func run() {
 
 	router.StaticFS("/build", http.Dir(filepath.Join(filepath.Dir(self), "public/build")))
 	router.StaticFile("favicon.ico", filepath.Join(filepath.Dir(self), "public/favicon.ico"))
-	router.LoadHTMLFiles(filepath.Join(filepath.Dir(self), "public/index.html"))
+	router.LoadHTMLFiles(
+		filepath.Join(filepath.Dir(self), "public/index.html"),
+		filepath.Join(filepath.Dir(self), "public/player.html"),
+	)
 
 	router.GET("/", func(c *gin.Context) {
 		c.HTML(200, "index.html", nil)
@@ -77,6 +80,10 @@ func run() {
 		}
 
 		c.JSON(200, gin.H{"total": total, "list": list})
+	})
+
+	router.GET("/play", func(c *gin.Context) {
+		c.HTML(200, "player.html", nil)
 	})
 
 	router.POST("/play", func(c *gin.Context) {

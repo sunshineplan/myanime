@@ -52,7 +52,7 @@
     alert("Failed to get list");
   };
 
-  const open = async (play: play) => {
+  const open = async (title: string, play: play) => {
     loading++;
     const resp = await fetch("/play", {
       method: "post",
@@ -62,7 +62,7 @@
     loading--;
     if (resp.ok) {
       const url = await resp.text();
-      window.open(url);
+      window.open(`/play?title=${title} - ${play.title}&url=${url}`);
       return;
     }
     alert("Failed to get play");
@@ -125,7 +125,7 @@
       </div>
       <div class="playlist">
         {#each anime.playlist as play (play.index + play.ep)}
-          <li on:click={() => open(play)}>
+          <li on:click={() => open(anime.name, play)}>
             <span class="play">{play.title}</span>
           </li>
         {/each}
