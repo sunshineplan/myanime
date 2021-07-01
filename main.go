@@ -25,9 +25,10 @@ var u *url.URL
 
 var s = gohttp.NewSession()
 var svc = service.Service{
-	Name: "MyAnime",
-	Desc: "Instance to serve My Anime",
-	Exec: run,
+	Name:     "MyAnime",
+	Desc:     "Instance to serve My Anime",
+	Exec:     run,
+	TestExec: test,
 	Options: service.Options{
 		Dependencies: []string{"After=network.target"},
 		Environment:  map[string]string{"GIN_MODE": "release"},
@@ -90,11 +91,13 @@ func main() {
 
 	switch flag.NArg() {
 	case 0:
-		run()
+		svc.Run(false)
 	case 1:
 		switch flag.Arg(0) {
 		case "run", "debug":
-			run()
+			svc.Run(true)
+		case "test":
+			err = svc.Test()
 		case "install":
 			err = svc.Install()
 		case "remove":

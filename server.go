@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -11,6 +12,18 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sunshineplan/utils"
 )
+
+func test() error {
+	list, total, err := loadList("", 0)
+	if err != nil {
+		return err
+	}
+	if l := len(list); l == 0 || total == 0 {
+		return fmt.Errorf("not expected result. length: %d, total: %d", l, total)
+	}
+
+	return nil
+}
 
 func run() {
 	if *logPath != "" {
