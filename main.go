@@ -42,12 +42,9 @@ func init() {
 		log.Fatalln("Failed to get self path:", err)
 	}
 
-	agent, err := utils.UserAgentString()
-	if err != nil {
-		log.Print("Getting user agent failed. Use default agent instead.")
-		agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36"
-	}
-	gohttp.SetAgent(agent)
+	gohttp.SetAgent(utils.UserAgent(
+		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36",
+	))
 
 	rand.Seed(time.Now().UnixNano())
 }
