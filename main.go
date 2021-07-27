@@ -88,7 +88,7 @@ func main() {
 
 	switch flag.NArg() {
 	case 0:
-		svc.Run(false)
+		run()
 	case 1:
 		switch flag.Arg(0) {
 		case "run", "debug":
