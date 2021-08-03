@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/anaskhan96/soup v1.2.4
-	github.com/gin-gonic/gin v1.7.2
+	github.com/gin-gonic/gin v1.7.3
 	github.com/sunshineplan/gohttp v1.0.0
 	github.com/sunshineplan/service v1.0.1
 	github.com/sunshineplan/utils v0.0.1

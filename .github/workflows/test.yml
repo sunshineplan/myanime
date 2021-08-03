@@ -34,4 +34,7 @@ jobs:
           npm i --no-package-lock
           npm run build
           go build -v ./...
-          go test -api ${{ secrets.API }}
+
+      - name: Test API
+        if: ${{ github.actor != 'dependabot[bot]' }}
+        run: go test -api ${{ secrets.API }}
