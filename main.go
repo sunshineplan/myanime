@@ -43,7 +43,7 @@ func init() {
 	}
 
 	gohttp.SetAgent(utils.UserAgent(
-		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36",
+		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.159 Safari/537.36",
 	))
 
 	rand.Seed(time.Now().UnixNano())
@@ -91,7 +91,9 @@ func main() {
 		run()
 	case 1:
 		switch flag.Arg(0) {
-		case "run", "debug":
+		case "run":
+			svc.Run(false)
+		case "debug":
 			svc.Run(true)
 		case "test":
 			err = svc.Test()
