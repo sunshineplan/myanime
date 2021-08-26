@@ -107,10 +107,9 @@ func run() {
 		}
 
 		var url string
-		var err error
-		if err := utils.Retry(func() error {
-			url, err = play.getURL()
-			return err
+		if err := utils.Retry(func() (err error) {
+			url, err = play.loadPlay()
+			return
 		}, 3, 3); err != nil {
 			log.Print(err)
 			c.String(500, "")

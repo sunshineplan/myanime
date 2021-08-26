@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
 	"math"
 	"math/rand"
@@ -10,6 +12,11 @@ import (
 	"time"
 
 	"github.com/anaskhan96/soup"
+	"github.com/chromedp/cdproto/cdp"
+	"github.com/chromedp/cdproto/fetch"
+	"github.com/chromedp/cdproto/network"
+	"github.com/chromedp/cdproto/runtime"
+	"github.com/chromedp/chromedp"
 	"github.com/sunshineplan/gohttp"
 )
 
@@ -137,7 +144,7 @@ func (a *anime) getPlayList() error {
 	return nil
 }
 
-func (p *play) getURL() (string, error) {
+func (p *play) getPlay() (string, error) {
 	s.Get(fmt.Sprintf("%s/play/%s?playid=%s_%s", api, p.AID, p.Index, p.EP), nil)
 
 	var t1 float64
@@ -169,6 +176,72 @@ func (p *play) getURL() (string, error) {
 	)
 	var r struct{ Vurl string }
 	if err := resp.JSON(&r); err != nil {
+		return "", err
+	}
+
+	return url.QueryUnescape(r.Vurl)
+}
+
+func (p *play) getPlay2() (string, error) {
+	ctx, cancel := chromedp.NewContext(context.Background())
+	defer cancel()
+
+	ctx, cancel = context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	var id network.RequestID
+	done := make(chan bool)
+	chromedp.ListenTarget(ctx, func(v interface{}) {
+		switch ev := v.(type) {
+		case *network.EventRequestWillBeSent:
+			if strings.Contains(ev.Request.URL, "getplay2") {
+				id = ev.RequestID
+			}
+		case *network.EventLoadingFinished:
+			if ev.RequestID == id {
+				close(done)
+			}
+		case *fetch.EventRequestPaused:
+			go func() {
+				c := chromedp.FromContext(ctx)
+				ctx := cdp.WithExecutor(ctx, c.Target)
+
+				if (ev.ResourceType == network.ResourceTypeDocument ||
+					ev.ResourceType == network.ResourceTypeScript ||
+					ev.ResourceType == network.ResourceTypeXHR) ||
+					strings.Contains(ev.Request.URL, "getplay2") {
+					fetch.ContinueRequest(ev.RequestID).Do(ctx)
+				} else {
+					fetch.FailRequest(ev.RequestID, network.ErrorReasonBlockedByClient).Do(ctx)
+				}
+			}()
+		}
+	})
+
+	if err := chromedp.Run(
+		ctx,
+		runtime.Disable(),
+		fetch.Enable(),
+		chromedp.Navigate(fmt.Sprintf("%s/play/%s?playid=%s_%s", api, p.AID, p.Index, p.EP)),
+	); err != nil {
+		return "", err
+	}
+
+	<-done
+
+	var body []byte
+	if err := chromedp.Run(
+		ctx,
+		chromedp.ActionFunc(func(ctx context.Context) (err error) {
+			body, err = network.GetResponseBody(id).Do(ctx)
+			return
+		}),
+	); err != nil {
+		return "", err
+	}
+
+	var r struct{ Vurl string }
+	if err := json.Unmarshal(body, &r); err != nil {
 		return "", err
 	}
 

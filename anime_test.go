@@ -61,7 +61,7 @@ func TestGetURL(t *testing.T) {
 	expected := "//www.iqiyi.com/v_19rrok4nt0.html"
 	if err := utils.Retry(
 		func() error {
-			res, err = (&play{AID: "20000001", Index: "2", EP: "1"}).getURL()
+			res, err = (&play{AID: "20000001", Index: "2", EP: "1"}).loadPlay()
 			if err != nil {
 				t.Fatal(err)
 			}

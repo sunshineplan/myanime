@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/sunshineplan/utils/cache"
@@ -56,4 +57,24 @@ func loadPlayList(url, id string) (playlist []play, err error) {
 	c.Set(id, playlist, time.Hour, nil)
 
 	return
+}
+
+func (p *play) loadPlay() (string, error) {
+	id := fmt.Sprintf("%s?playid=%s_%s", p.AID, p.Index, p.EP)
+	value, ok := c.Get(id)
+	if ok {
+		return value.(string), nil
+	}
+
+	url, err := p.getPlay()
+	if err != nil {
+		url, err = p.getPlay2()
+		if err != nil {
+			return "", err
+		}
+	}
+
+	c.Set(id, url, time.Hour, nil)
+
+	return url, nil
 }
