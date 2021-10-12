@@ -20,10 +20,10 @@ import (
 
 var api, self string
 var logPath *string
-var server httpsvr.Server
 var u *url.URL
 
 var s = gohttp.NewSession()
+var server = httpsvr.New()
 var svc = service.Service{
 	Name:     "MyAnime",
 	Desc:     "Instance to serve My Anime",
