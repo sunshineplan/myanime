@@ -38,6 +38,7 @@ func run() {
 
 	router := gin.Default()
 	server.Handler = router
+	router.TrustedPlatform = "X-Real-IP"
 
 	router.StaticFS("/build", http.Dir(filepath.Join(filepath.Dir(self), "public/build")))
 	router.StaticFile("favicon.ico", filepath.Join(filepath.Dir(self), "public/favicon.ico"))
