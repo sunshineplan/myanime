@@ -179,23 +179,25 @@ func (p *play) getPlay() (string, error) {
 		return "", err
 	}
 
-	return url.QueryUnescape(r.Vurl)
+	return m3u8(resp.Request.URL, r.Vurl)
 }
 
 func (p *play) getPlay2() (string, error) {
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
 
-	ctx, cancel = context.WithTimeout(ctx, 6*time.Second)
+	ctx, cancel = context.WithTimeout(ctx, 7*time.Second)
 	defer cancel()
 
 	var id network.RequestID
+	var requestURL string
 	done := make(chan bool)
 	chromedp.ListenTarget(ctx, func(v interface{}) {
 		switch ev := v.(type) {
 		case *network.EventRequestWillBeSent:
 			if strings.Contains(ev.Request.URL, "getplay2") && ev.Request.Method == "GET" {
 				id = ev.RequestID
+				requestURL = ev.Request.URL
 			}
 		case *network.EventLoadingFinished:
 			if ev.RequestID == id {
@@ -245,5 +247,26 @@ func (p *play) getPlay2() (string, error) {
 		return "", err
 	}
 
-	return url.QueryUnescape(r.Vurl)
+	rurl, _ := url.Parse(requestURL)
+
+	return m3u8(rurl, r.Vurl)
+}
+
+func m3u8(u *url.URL, vurl string) (string, error) {
+	vu, _ := url.QueryUnescape(vurl)
+	m3u8URL, err := url.Parse(vu)
+	if err != nil {
+		return "", err
+	}
+	if m3u8URL.Host == "" {
+		m3u8URL.Scheme = u.Scheme
+		m3u8URL.Host = u.Host
+	}
+
+	m3u8 := gohttp.Get(m3u8URL.String(), nil).String()
+	if m3u8 == "" {
+		return "", fmt.Errorf("empty m3u8")
+	}
+
+	return m3u8, nil
 }

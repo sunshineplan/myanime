@@ -66,15 +66,15 @@ func (p *play) loadPlay() (string, error) {
 		return value.(string), nil
 	}
 
-	url, err := p.getPlay()
+	m3u8, err := p.getPlay()
 	if err != nil {
-		url, err = p.getPlay2()
+		m3u8, err = p.getPlay2()
 		if err != nil {
 			return "", err
 		}
 	}
 
-	c.Set(id, url, time.Hour, nil)
+	c.Set(id, m3u8, time.Hour, nil)
 
-	return url, nil
+	return m3u8, nil
 }

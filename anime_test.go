@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"net/url"
 	"testing"
 
@@ -57,30 +56,28 @@ func TestGetURL(t *testing.T) {
 	}
 	u.Path = ""
 
-	var res string
-	expected := "//www.iqiyi.com/v_19rrok4nt0.html"
-
-	test := func(fn func() (string, error)) error {
-		return utils.Retry(
+	getURL := func(fn func() (string, error)) (res string, err error) {
+		err = utils.Retry(
 			func() error {
 				res, err = fn()
-				if err != nil {
-					t.Fatal(err)
-				}
-
-				if res == expected {
-					return nil
-				}
-				return fmt.Errorf("not match")
+				return err
 			}, 3, 5)
+		return
 	}
 
-	for _, fn := range []func() (string, error){
-		(&play{AID: "20220011", Index: "2", EP: "1"}).getPlay,
-		(&play{AID: "20000001", Index: "2", EP: "1"}).getPlay2,
-	} {
-		if err := test(fn); err != nil {
-			t.Errorf("expected %q; got %q", expected, res)
-		}
+	play := play{AID: "20220011", Index: "2", EP: "1"}
+	url1, err := getURL(play.getPlay)
+	if err != nil {
+		t.Fatal(err)
+	}
+	url2, err := getURL(play.getPlay2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if url1 == "" {
+		t.Fatal("getPlay is empty")
+	}
+	if url1 != url2 {
+		t.Fatal("url1 is not same as url2")
 	}
 }

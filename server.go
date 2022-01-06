@@ -107,9 +107,8 @@ func run() {
 			return
 		}
 
-		var url string
 		if err := utils.Retry(func() (err error) {
-			url, err = play.loadPlay()
+			_, err = play.loadPlay()
 			return
 		}, 3, 3); err != nil {
 			log.Print(err)
@@ -117,7 +116,18 @@ func run() {
 			return
 		}
 
-		c.String(200, url)
+		c.String(200, fmt.Sprintf("/m3u8/%s/%s/%s", play.AID, play.Index, play.EP))
+	})
+
+	router.GET("/m3u8/:aid/:index/:ep", func(c *gin.Context) {
+		play := play{AID: c.Param("aid"), Index: c.Param("index"), EP: c.Param("ep")}
+		m3u8, err := play.loadPlay()
+		if err == nil {
+			c.String(200, m3u8)
+		} else {
+			log.Print(err)
+			c.String(404, "")
+		}
 	})
 
 	router.NoRoute(func(c *gin.Context) {
