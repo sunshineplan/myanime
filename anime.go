@@ -186,7 +186,7 @@ func (p *play) getPlay2() (string, error) {
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
 
-	ctx, cancel = context.WithTimeout(ctx, 5*time.Second)
+	ctx, cancel = context.WithTimeout(ctx, 6*time.Second)
 	defer cancel()
 
 	var id network.RequestID
@@ -194,7 +194,7 @@ func (p *play) getPlay2() (string, error) {
 	chromedp.ListenTarget(ctx, func(v interface{}) {
 		switch ev := v.(type) {
 		case *network.EventRequestWillBeSent:
-			if strings.Contains(ev.Request.URL, "getplay2") {
+			if strings.Contains(ev.Request.URL, "getplay2") && ev.Request.Method == "GET" {
 				id = ev.RequestID
 			}
 		case *network.EventLoadingFinished:

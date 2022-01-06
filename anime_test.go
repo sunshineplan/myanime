@@ -59,18 +59,28 @@ func TestGetURL(t *testing.T) {
 
 	var res string
 	expected := "//www.iqiyi.com/v_19rrok4nt0.html"
-	if err := utils.Retry(
-		func() error {
-			res, err = (&play{AID: "20000001", Index: "2", EP: "1"}).loadPlay()
-			if err != nil {
-				t.Fatal(err)
-			}
 
-			if res == expected {
-				return nil
-			}
-			return fmt.Errorf("not match")
-		}, 3, 5); err != nil {
-		t.Errorf("expected %q; got %q", expected, res)
+	test := func(fn func() (string, error)) error {
+		return utils.Retry(
+			func() error {
+				res, err = fn()
+				if err != nil {
+					t.Fatal(err)
+				}
+
+				if res == expected {
+					return nil
+				}
+				return fmt.Errorf("not match")
+			}, 3, 5)
+	}
+
+	for _, fn := range []func() (string, error){
+		(&play{AID: "20220011", Index: "2", EP: "1"}).getPlay,
+		(&play{AID: "20000001", Index: "2", EP: "1"}).getPlay2,
+	} {
+		if err := test(fn); err != nil {
+			t.Errorf("expected %q; got %q", expected, res)
+		}
 	}
 }
