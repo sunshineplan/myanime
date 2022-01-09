@@ -1,16 +1,11 @@
 package main
 
 import (
-	"flag"
 	"net/url"
 	"testing"
 
 	"github.com/sunshineplan/utils"
 )
-
-func init() {
-	flag.StringVar(&api, "api", "", "API")
-}
 
 func TestGetList(t *testing.T) {
 	list, n, err := getList("", 0)
@@ -39,7 +34,7 @@ func TestSearch(t *testing.T) {
 }
 
 func TestGetPlayList(t *testing.T) {
-	list, err := getPlayList(api+"/detail/20000001", "")
+	list, err := getPlayList(*api+"/detail/20000001", "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -50,7 +45,7 @@ func TestGetPlayList(t *testing.T) {
 
 func TestGetURL(t *testing.T) {
 	var err error
-	u, err = url.ParseRequestURI(api)
+	u, err = url.ParseRequestURI(*api)
 	if err != nil {
 		t.Fatal(err)
 	}

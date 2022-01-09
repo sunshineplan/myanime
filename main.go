@@ -18,8 +18,7 @@ import (
 	"github.com/vharitonsky/iniflags"
 )
 
-var api, self string
-var logPath *string
+var self string
 var u *url.URL
 
 var s = gohttp.NewSession()
@@ -34,6 +33,13 @@ var svc = service.Service{
 		Environment:  map[string]string{"GIN_MODE": "release"},
 	},
 }
+
+var (
+	api     = flag.String("api", "", "API")
+	exclude = flag.String("exclude", "", "Exclude Files")
+	logPath = flag.String("log", "", "Log Path")
+	chrome  = flag.Bool("chrome", false, "Use Chrome")
+)
 
 func init() {
 	var err error
@@ -59,21 +65,17 @@ usage: %s <command>
 }
 
 func main() {
-	flag.StringVar(&api, "api", "", "API")
 	flag.StringVar(&server.Unix, "unix", "", "UNIX-domain Socket")
 	flag.StringVar(&server.Host, "host", "0.0.0.0", "Server Host")
 	flag.StringVar(&server.Port, "port", "12345", "Server Port")
 	flag.StringVar(&svc.Options.UpdateURL, "update", "", "Update URL")
-	exclude := flag.String("exclude", "", "Exclude Files")
-	//logPath = flag.String("log", joinPath(dir(self), "access.log"), "Log Path")
-	logPath = flag.String("log", "", "Log Path")
 	iniflags.SetConfigFile(filepath.Join(filepath.Dir(self), "config.ini"))
 	iniflags.SetAllowMissingConfigFile(true)
 	iniflags.SetAllowUnknownFlags(true)
 	iniflags.Parse()
 
 	var err error
-	u, err = url.ParseRequestURI(api)
+	u, err = url.ParseRequestURI(*api)
 	if err != nil {
 		log.Fatal(err)
 	}

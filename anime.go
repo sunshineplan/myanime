@@ -41,7 +41,7 @@ func getList(query string, page int) (list []anime, total int, err error) {
 	var doc soup.Root
 	var roots []soup.Root
 	if query == "" {
-		resp, err = soup.Get(fmt.Sprintf("%s/update?page=%d", api, page))
+		resp, err = soup.Get(fmt.Sprintf("%s/update?page=%d", *api, page))
 		if err != nil {
 			return
 		}
@@ -49,7 +49,7 @@ func getList(query string, page int) (list []anime, total int, err error) {
 		doc = soup.HTMLParse(resp)
 		roots = doc.FindAll("li", "class", "anime_icon2")
 	} else {
-		resp, err = soup.Get(fmt.Sprintf("%s/search?query=%s&page=%d", api, query, page))
+		resp, err = soup.Get(fmt.Sprintf("%s/search?query=%s&page=%d", *api, query, page))
 		if err != nil {
 			return
 		}
@@ -88,7 +88,7 @@ func getList(query string, page int) (list []anime, total int, err error) {
 		a := i.Find("a")
 		href := a.Attrs()["href"]
 		anime.ID = strings.ReplaceAll(href, "/detail/", "")
-		anime.URL = api + href
+		anime.URL = *api + href
 
 		img := i.Find("img")
 		anime.Name = img.Attrs()["alt"]
@@ -123,7 +123,7 @@ func getPlayList(u, id string) ([]play, error) {
 
 		playlist = append(playlist, play{
 			AID:   id,
-			URL:   api + href.String(),
+			URL:   *api + href.String(),
 			Index: strings.Split(playid, "_")[0],
 			EP:    strings.Split(playid, "_")[1],
 			Title: i.Text(),
@@ -145,7 +145,7 @@ func (a *anime) getPlayList() error {
 }
 
 func (p *play) getPlay() (string, error) {
-	s.Get(fmt.Sprintf("%s/play/%s?playid=%s_%s", api, p.AID, p.Index, p.EP), nil)
+	s.Get(fmt.Sprintf("%s/play/%s?playid=%s_%s", *api, p.AID, p.Index, p.EP), nil)
 
 	var t1 float64
 	for _, i := range s.Cookies(u) {
@@ -171,8 +171,8 @@ func (p *play) getPlay() (string, error) {
 	s.SetCookie(u, "fa_c", "1")
 
 	resp := s.Get(
-		fmt.Sprintf("%s/_getplay?aid=%s&playindex=%s&epindex=%s&r=%.f", api, p.AID, p.Index, p.EP, rand.Float64()),
-		gohttp.H{"referer": api},
+		fmt.Sprintf("%s/_getplay?aid=%s&playindex=%s&epindex=%s&r=%.f", *api, p.AID, p.Index, p.EP, rand.Float64()),
+		gohttp.H{"referer": *api},
 	)
 	var r struct{ Vurl string }
 	if err := resp.JSON(&r); err != nil {
@@ -224,7 +224,7 @@ func (p *play) getPlay2() (string, error) {
 		ctx,
 		runtime.Disable(),
 		fetch.Enable(),
-		chromedp.Navigate(fmt.Sprintf("%s/play/%s?playid=%s_%s", api, p.AID, p.Index, p.EP)),
+		chromedp.Navigate(fmt.Sprintf("%s/play/%s?playid=%s_%s", *api, p.AID, p.Index, p.EP)),
 	); err != nil {
 		return "", err
 	}
