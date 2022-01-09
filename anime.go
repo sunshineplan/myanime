@@ -179,7 +179,7 @@ func (p *play) getPlay() (string, error) {
 		return "", err
 	}
 
-	return m3u8(resp.Request.URL, r.Vurl)
+	return parse(resp.Request.URL, r.Vurl)
 }
 
 func (p *play) getPlay2() (string, error) {
@@ -249,24 +249,32 @@ func (p *play) getPlay2() (string, error) {
 
 	rurl, _ := url.Parse(requestURL)
 
-	return m3u8(rurl, r.Vurl)
+	return parse(rurl, r.Vurl)
 }
 
-func m3u8(u *url.URL, vurl string) (string, error) {
+func parse(u *url.URL, vurl string) (string, error) {
 	vu, _ := url.QueryUnescape(vurl)
-	m3u8URL, err := url.Parse(vu)
+	vURL, err := url.Parse(vu)
 	if err != nil {
 		return "", err
 	}
-	if m3u8URL.Host == "" {
-		m3u8URL.Scheme = u.Scheme
-		m3u8URL.Host = u.Host
+	if vURL.Host == "" {
+		vURL.Scheme = u.Scheme
+		vURL.Host = u.Host
 	}
 
-	m3u8 := gohttp.Get(m3u8URL.String(), nil).String()
-	if m3u8 == "" {
-		return "", fmt.Errorf("empty m3u8")
+	resp := gohttp.Get(vURL.String(), nil)
+	if resp.Error != nil {
+		return "", resp.Error
 	}
 
-	return m3u8, nil
+	if resp.ContentLength < 3*1024*1024 {
+		m3u8 := resp.String()
+		if m3u8 == "" {
+			return "", fmt.Errorf("empty m3u8")
+		}
+
+		return m3u8, nil
+	}
+	return "url:" + vURL.String(), nil
 }

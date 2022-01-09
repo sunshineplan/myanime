@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -107,8 +108,9 @@ func run() {
 			return
 		}
 
+		var res string
 		if err := utils.Retry(func() (err error) {
-			_, err = play.loadPlay()
+			res, err = play.loadPlay()
 			return
 		}, 3, 3); err != nil {
 			log.Print(err)
@@ -116,14 +118,22 @@ func run() {
 			return
 		}
 
-		c.String(200, fmt.Sprintf("/m3u8/%s/%s/%s", play.AID, play.Index, play.EP))
+		if strings.HasPrefix(res, "url:") {
+			c.String(200, strings.TrimPrefix(res, "url:"))
+		} else {
+			c.String(200, fmt.Sprintf("/m3u8/%s/%s/%s", play.AID, play.Index, play.EP))
+		}
 	})
 
 	router.GET("/m3u8/:aid/:index/:ep", func(c *gin.Context) {
 		play := play{AID: c.Param("aid"), Index: c.Param("index"), EP: c.Param("ep")}
-		m3u8, err := play.loadPlay()
+		res, err := play.loadPlay()
 		if err == nil {
-			c.String(200, m3u8)
+			if strings.HasPrefix(res, "url:") {
+				c.String(200, strings.TrimPrefix(res, "url:"))
+			} else {
+				c.String(200, res)
+			}
 		} else {
 			log.Print(err)
 			c.String(404, "")
