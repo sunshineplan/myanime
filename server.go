@@ -132,7 +132,7 @@ func run() {
 			if strings.HasPrefix(res, prefix) {
 				c.String(200, strings.TrimPrefix(res, prefix))
 			} else {
-				c.String(200, res)
+				c.Data(200, "application/vnd.apple.mpegurl", []byte(res))
 			}
 		} else {
 			log.Print(err)
