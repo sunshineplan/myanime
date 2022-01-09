@@ -118,8 +118,8 @@ func run() {
 			return
 		}
 
-		if strings.HasPrefix(res, "url:") {
-			c.String(200, strings.TrimPrefix(res, "url:"))
+		if strings.HasPrefix(res, prefix) {
+			c.String(200, strings.TrimPrefix(res, prefix))
 		} else {
 			c.String(200, fmt.Sprintf("/m3u8/%s/%s/%s", play.AID, play.Index, play.EP))
 		}
@@ -129,8 +129,8 @@ func run() {
 		play := play{AID: c.Param("aid"), Index: c.Param("index"), EP: c.Param("ep")}
 		res, err := play.loadPlay()
 		if err == nil {
-			if strings.HasPrefix(res, "url:") {
-				c.String(200, strings.TrimPrefix(res, "url:"))
+			if strings.HasPrefix(res, prefix) {
+				c.String(200, strings.TrimPrefix(res, prefix))
 			} else {
 				c.String(200, res)
 			}

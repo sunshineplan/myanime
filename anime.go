@@ -20,6 +20,8 @@ import (
 	"github.com/sunshineplan/gohttp"
 )
 
+const prefix = "anime:"
+
 type anime struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
@@ -276,5 +278,5 @@ func parse(u *url.URL, vurl string) (string, error) {
 
 		return m3u8, nil
 	}
-	return "url:" + vURL.String(), nil
+	return prefix + url.QueryEscape(vURL.String()), nil
 }
