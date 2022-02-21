@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -12,6 +13,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sunshineplan/utils"
+)
+
+var (
+	urlParse         = url.Parse
+	urlQueryEscape   = url.QueryEscape
+	urlQueryUnescape = url.QueryUnescape
 )
 
 func test() error {
@@ -119,9 +126,32 @@ func run() {
 		}
 
 		if strings.HasPrefix(res, prefix) {
-			c.String(200, strings.TrimPrefix(res, prefix))
+			url := strings.TrimPrefix(res, prefix)
+			if testM3U8(url) {
+				c.String(200, fmt.Sprint("/m3u8?ref=", urlQueryEscape(url)))
+			} else {
+				c.String(200, urlQueryEscape(url))
+			}
 		} else {
 			c.String(200, fmt.Sprintf("/m3u8/%s/%s/%s", play.AID, play.Index, play.EP))
+		}
+	})
+
+	router.GET("/m3u8", func(c *gin.Context) {
+		url := c.Query("ref")
+		url, err := urlQueryUnescape(url)
+		if err != nil {
+			log.Print(err)
+			c.String(404, "")
+			return
+		}
+
+		res, err := loadM3U8(url)
+		if err == nil {
+			c.Data(200, "application/vnd.apple.mpegurl", []byte(res))
+		} else {
+			log.Print(err)
+			c.String(404, "")
 		}
 	})
 

@@ -265,12 +265,12 @@ func parse(u *url.URL, vurl string) (string, error) {
 		vURL.Host = u.Host
 	}
 
-	resp := gohttp.Get(vURL.String(), nil)
-	if resp.Error != nil {
-		return "", resp.Error
-	}
+	if testM3U8(vURL.String()) {
+		resp := gohttp.Get(vURL.String(), nil)
+		if resp.Error != nil {
+			return "", resp.Error
+		}
 
-	if resp.ContentLength < 3*1024*1024 {
 		m3u8 := resp.String()
 		if m3u8 == "" {
 			return "", fmt.Errorf("empty m3u8")
@@ -278,5 +278,17 @@ func parse(u *url.URL, vurl string) (string, error) {
 
 		return m3u8, nil
 	}
-	return prefix + url.QueryEscape(vURL.String()), nil
+
+	return prefix + vURL.String(), nil
+}
+
+func testM3U8(url string) bool {
+	resp := gohttp.Head(url, nil)
+	if resp.Error != nil {
+		return true
+	}
+	if resp.StatusCode != 200 {
+		return true
+	}
+	return resp.ContentLength < 3*1024*1024
 }
