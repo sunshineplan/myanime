@@ -194,7 +194,7 @@ func (p *play) getPlay2() (string, error) {
 	var id network.RequestID
 	var requestURL string
 	done := make(chan bool)
-	chromedp.ListenTarget(ctx, func(v interface{}) {
+	chromedp.ListenTarget(ctx, func(v any) {
 		switch ev := v.(type) {
 		case *network.EventRequestWillBeSent:
 			if strings.Contains(ev.Request.URL, "getplay2") && ev.Request.Method == "GET" {

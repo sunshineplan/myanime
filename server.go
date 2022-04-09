@@ -12,7 +12,7 @@ import (
 	"sync"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sunshineplan/utils"
+	"github.com/sunshineplan/utils/retry"
 )
 
 var (
@@ -74,7 +74,7 @@ func run() {
 
 		var list []anime
 		var total int
-		if err := utils.Retry(func() error {
+		if err := retry.Do(func() error {
 			list, total, err = loadList(q, page)
 			return err
 		}, 3, 2); err != nil {
@@ -88,7 +88,7 @@ func run() {
 		for i := range list {
 			go func(a *anime) {
 				defer wg.Done()
-				if e := utils.Retry(a.getPlayList, 3, 1); e != nil {
+				if e := retry.Do(a.getPlayList, 3, 1); e != nil {
 					err = e
 					log.Print(err)
 				}
@@ -116,7 +116,7 @@ func run() {
 		}
 
 		var res string
-		if err := utils.Retry(func() (err error) {
+		if err := retry.Do(func() (err error) {
 			res, err = play.loadPlay()
 			return
 		}, 3, 3); err != nil {

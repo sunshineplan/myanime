@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/sunshineplan/utils"
+	"github.com/sunshineplan/utils/retry"
 )
 
 func TestGetList(t *testing.T) {
@@ -52,7 +52,7 @@ func TestGetURL(t *testing.T) {
 	u.Path = ""
 
 	getURL := func(fn func() (string, error)) (res string, err error) {
-		err = utils.Retry(
+		err = retry.Do(
 			func() error {
 				res, err = fn()
 				return err
