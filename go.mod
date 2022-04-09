@@ -8,7 +8,7 @@ require (
 	github.com/chromedp/chromedp v0.8.0
 	github.com/gin-gonic/gin v1.7.7
 	github.com/sunshineplan/gohttp v1.0.4
-	github.com/sunshineplan/hlsdl v1.0.1
+	github.com/sunshineplan/hlsdl v1.0.2
 	github.com/sunshineplan/service v1.0.3
 	github.com/sunshineplan/utils v0.1.2
 	github.com/vharitonsky/iniflags v0.0.0-20180513140207-a33cd0b5f3de
