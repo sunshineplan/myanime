@@ -1,17 +1,10 @@
 name: Test
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 1 * *'
 
 jobs:
   test:
-    if: ${{ github.actor != 'dependabot[bot]' }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
