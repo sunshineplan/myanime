@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"math"
@@ -12,11 +11,10 @@ import (
 	"time"
 
 	"github.com/anaskhan96/soup"
-	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/cdproto/fetch"
 	"github.com/chromedp/cdproto/network"
-	"github.com/chromedp/cdproto/runtime"
 	"github.com/chromedp/chromedp"
+	"github.com/sunshineplan/chrome"
 	"github.com/sunshineplan/gohttp"
 )
 
@@ -185,73 +183,39 @@ func (p *play) getPlay() (string, error) {
 }
 
 func (p *play) getPlay2() (string, error) {
-	ctx, cancel := chromedp.NewContext(context.Background())
-	defer cancel()
+	c := chrome.Headless(false)
+	if _, _, err := c.WithTimeout(10 * time.Second); err != nil {
+		return "", err
+	}
+	defer c.Close()
 
-	ctx, cancel = context.WithTimeout(ctx, 10*time.Second)
-	defer cancel()
+	if err := c.EnableFetch(func(ev *fetch.EventRequestPaused) bool {
+		return ev.ResourceType == network.ResourceTypeDocument ||
+			ev.ResourceType == network.ResourceTypeScript ||
+			ev.ResourceType == network.ResourceTypeXHR ||
+			strings.Contains(ev.Request.URL, "getplay2")
+	}); err != nil {
+		return "", err
+	}
 
-	var id network.RequestID
-	var requestURL string
-	done := make(chan bool)
-	chromedp.ListenTarget(ctx, func(v any) {
-		switch ev := v.(type) {
-		case *network.EventRequestWillBeSent:
-			if strings.Contains(ev.Request.URL, "getplay2") && ev.Request.Method == "GET" {
-				id = ev.RequestID
-				requestURL = ev.Request.URL
-			}
-		case *network.EventLoadingFinished:
-			if ev.RequestID == id {
-				close(done)
-			}
-		case *fetch.EventRequestPaused:
-			go func() {
-				c := chromedp.FromContext(ctx)
-				ctx := cdp.WithExecutor(ctx, c.Target)
+	done := c.ListenEvent(chrome.URLContains("getplay2"), "GET", true)
+	if err := chromedp.Run(c, chromedp.Navigate(fmt.Sprintf("%s/play/%s?playid=%s_%s", *api, p.AID, p.Index, p.EP))); err != nil {
+		return "", err
+	}
 
-				if (ev.ResourceType == network.ResourceTypeDocument ||
-					ev.ResourceType == network.ResourceTypeScript ||
-					ev.ResourceType == network.ResourceTypeXHR) ||
-					strings.Contains(ev.Request.URL, "getplay2") {
-					fetch.ContinueRequest(ev.RequestID).Do(ctx)
-				} else {
-					fetch.FailRequest(ev.RequestID, network.ErrorReasonBlockedByClient).Do(ctx)
-				}
-			}()
+	select {
+	case <-c.Done():
+		return "", c.Err()
+	case e := <-done:
+		var r struct{ Vurl string }
+		if err := json.Unmarshal(e.Bytes, &r); err != nil {
+			return "", err
 		}
-	})
 
-	if err := chromedp.Run(
-		ctx,
-		runtime.Disable(),
-		fetch.Enable(),
-		chromedp.Navigate(fmt.Sprintf("%s/play/%s?playid=%s_%s", *api, p.AID, p.Index, p.EP)),
-	); err != nil {
-		return "", err
+		rurl, _ := url.Parse(e.Request.Request.URL)
+
+		return parse(rurl, r.Vurl)
 	}
-
-	<-done
-
-	var body []byte
-	if err := chromedp.Run(
-		ctx,
-		chromedp.ActionFunc(func(ctx context.Context) (err error) {
-			body, err = network.GetResponseBody(id).Do(ctx)
-			return
-		}),
-	); err != nil {
-		return "", err
-	}
-
-	var r struct{ Vurl string }
-	if err := json.Unmarshal(body, &r); err != nil {
-		return "", err
-	}
-
-	rurl, _ := url.Parse(requestURL)
-
-	return parse(rurl, r.Vurl)
 }
 
 func parse(u *url.URL, vurl string) (string, error) {

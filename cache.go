@@ -90,12 +90,8 @@ func (p *play) loadPlay() (string, error) {
 
 	m3u8, err := p.getPlay()
 	if err != nil {
-		if *chrome {
-			m3u8, err = p.getPlay2()
-			if err != nil {
-				return "", err
-			}
-		} else {
+		m3u8, err = p.getPlay2()
+		if err != nil {
 			return "", err
 		}
 	}

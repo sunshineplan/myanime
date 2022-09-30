@@ -38,7 +38,6 @@ var (
 	api     = flag.String("api", "", "API")
 	exclude = flag.String("exclude", "", "Exclude Files")
 	logPath = flag.String("log", "", "Log Path")
-	chrome  = flag.Bool("chrome", false, "Use Chrome")
 )
 
 func init() {
