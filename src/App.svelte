@@ -119,12 +119,14 @@
 <div class="content" style="opacity: {loading ? 0.5 : 1}">
   {#each list as anime (anime.id)}
     <div style="display:flex">
+      <!-- svelte-ignore a11y-click-events-have-key-events -->
       <div class="anime" on:click={() => window.open(anime.url)}>
         <img src={anime.image} alt={anime.name} width="150px" height="208px" />
         {anime.name}
       </div>
       <div class="playlist">
         {#each anime.playlist as play (play.index + play.ep)}
+          <!-- svelte-ignore a11y-click-events-have-key-events -->
           <li on:click={() => open(anime.name, play)}>
             <span class="play">{play.title}</span>
           </li>
@@ -142,6 +144,7 @@
     <div class="sk-wave-rect" />
   </div>
 </div>
+<!-- svelte-ignore a11y-click-events-have-key-events -->
 <div
   class="top btn btn-secondary"
   on:click={() => {
