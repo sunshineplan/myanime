@@ -68,7 +68,7 @@ jobs:
             })
 
       - name: Pack
-        run: tar cvzf release.tar.gz public scripts myanime config.ini.default
+        run: tar cvzf release.tar.gz dist scripts myanime config.ini.default
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
